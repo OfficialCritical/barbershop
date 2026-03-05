@@ -85,7 +85,8 @@ namespace barberShop.Pages
             {
                 FodraszId = Input.FodraszId,
                 SzolgaltatasId = Input.SzolgaltatasId,
-                EsedekessegiIdopont = idopont,
+                EsedekessegiIdopont = DbDateTimeHelper.ToUtc(idopont),
+                FoglalasiIdopont = DbDateTimeHelper.ToUtc(DateTime.Now),
                 CustomerNeve = Input.UgyfelNev.Trim(),
                 CustomerEmail = Input.UgyfelEmail.Trim(),
                 CustomerPhone = Input.UgyfelTelefon.Trim(),

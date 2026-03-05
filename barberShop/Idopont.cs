@@ -1,4 +1,4 @@
-﻿namespace barberShop
+namespace barberShop
 {
     public class Idopont
     {
@@ -13,7 +13,7 @@
 
         public DateTime EsedekessegiIdopont {  get; set; }
 
-        public DateTime FoglalasiIdopont { get; set; } = DateTime.Now;
+        public DateTime FoglalasiIdopont { get; set; }
 
         //Vasarló adatok
         public string CustomerNeve { get; set; } = string.Empty;

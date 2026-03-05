@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -231,7 +231,8 @@ namespace barberShop.Pages
             {
                 FodraszId = fodr.ID,
                 SzolgaltatasId = szolg.Id,
-                EsedekessegiIdopont = kezdes,
+                EsedekessegiIdopont = DbDateTimeHelper.ToUtc(kezdes),
+                FoglalasiIdopont = DbDateTimeHelper.ToUtc(DateTime.Now),
                 CustomerNeve= UgyfelNev,
                 CustomerEmail=UgyfelEmail,
                 CustomerPhone=UgyfelTelefon,

@@ -61,12 +61,20 @@ namespace barberShop.Pages.Account
         public List<FodraszSzunet> BetoltSzunetek { get; set; } = new();
         #endregion
 
+
+
         #region
             public List<Idopont> MaiFoglalasok { get;set;  } = new();
             public List<Idopont> JovobeliFoglalasok { get; set; } = new();
             public List<Idopont> Regifoglalasok { get; set; } = new();
 
         #endregion
+        public static DateTime ToDbDate(DateTime d)
+        {
+            var date = d.Date;
+            return DateTime.SpecifyKind(date,DateTimeKind.Utc);
+        }
+
         public async Task<IActionResult> OnGetAsync()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -93,9 +101,9 @@ namespace barberShop.Pages.Account
 
             if (Section == "idopontjaim" && user.FodraszId != null)
             {
-                var datum = DateTime.Today;
+                var datum = ToDbDate(DateTime.Today);
                 if (!string.IsNullOrWhiteSpace(NaptarDatum) && DateTime.TryParse(NaptarDatum, out var parsed))
-                    datum = parsed.Date;
+                    datum = ToDbDate(parsed);
 
                 NaptarDatum = datum.ToString("yyyy-MM-dd");
 
@@ -120,7 +128,7 @@ namespace barberShop.Pages.Account
 
             if (Section == "foglalasaim" && user.FodraszId != null)
             {
-                var today = DateTime.Today;
+                var today = ToDbDate(DateTime.Today);
 
                 var osszes = await _context.Idopontok
                     .Include(i => i.Szolgaltatas)
@@ -129,7 +137,7 @@ namespace barberShop.Pages.Account
                     .ToListAsync();
 
                 MaiFoglalasok = osszes
-                    .Where(i => i.EsedekessegiIdopont == today)
+                    .Where(i => i.EsedekessegiIdopont.Date == today.Date)
                     .ToList();
 
                 JovobeliFoglalasok = osszes
@@ -200,7 +208,7 @@ namespace barberShop.Pages.Account
                 return RedirectToPage("/Account/FodraszFelulet", new { section = "idopontjaim" });
             }
 
-            datum = datum.Date;
+            datum = ToDbDate(datum);
 
             var munkaidok = await _context.FodraszMunkaidok
                 .Where(m => m.FodraszId == user.FodraszId && m.Datum == datum)
@@ -241,7 +249,7 @@ namespace barberShop.Pages.Account
                 return RedirectToPage("/Account/FodraszFelulet", new { Section = "idopontjaim" });
             }
 
-            datum = datum.Date;
+            datum =ToDbDate(datum);
             if (!TimeSpan.TryParse(MunkaidoKezdete, out var kezdo) || !TimeSpan.TryParse(MunkaidoVege,out var zaro) || kezdo >=zaro)
             {
                 TempData["Error"] = "Érvénytelen a megadott munkaidő kezdete és vége kombináció !";
@@ -271,7 +279,7 @@ namespace barberShop.Pages.Account
 
             if (string.IsNullOrWhiteSpace(NaptarDatum) || !DateTime.TryParse(NaptarDatum, out var datum))
                 return RedirectToPage("/Account/FodraszFelulet", new { section = "idopontjaim", naptarDatum = NaptarDatum });
-            datum = datum.Date;
+            datum = ToDbDate(datum);
 
             if (string.IsNullOrWhiteSpace(SzunetKezdete) || string.IsNullOrWhiteSpace(SzunetVege) ||
                 !TimeSpan.TryParse(SzunetKezdete, out var kezdo) || !TimeSpan.TryParse(SzunetVege, out var zaro))
@@ -309,10 +317,10 @@ namespace barberShop.Pages.Account
             if (user?.FodraszId == null)
                 return RedirectToPage("/Account/FodraszFelulet", new { section = "idopontjaim" });
 
-            var datum = DateTime.Today;
+            var datum = ToDbDate(DateTime.Today);
             if (!string.IsNullOrWhiteSpace(NaptarDatum) && DateTime.TryParse(NaptarDatum, out var parsed))
-                datum = parsed.Date;
-            var elozo = datum.AddDays(-1);
+                datum = ToDbDate(parsed);
+            var elozo = ToDbDate(datum.AddDays(-1));
 
             var elozoMunkaido = await _context.FodraszMunkaidok
                 .FirstOrDefaultAsync(m => m.FodraszId == user.FodraszId && m.Datum == elozo);
